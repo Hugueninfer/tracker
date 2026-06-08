@@ -17,7 +17,8 @@ export interface Habit {
 // ---- Kanban ----
 export interface CardImage {
   id: string
-  dataUrl: string // base64
+  storagePath: string
+  dataUrl: string // signed URL for display
   name: string
 }
 

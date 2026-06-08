@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Column, KanbanCard, CardImage, Label, DBLabel } from '@/lib/types'
+import type { Column, KanbanCard, Label, DBLabel } from '@/lib/types'
 import { useAuthStore } from '@/store/authStore'
 import * as api from '@/lib/api/kanban'
 
@@ -18,8 +18,8 @@ interface KanbanState {
   addCard: (columnId: string, title: string) => Promise<void>
   updateCard: (id: string, patch: Partial<KanbanCard>) => void
   removeCard: (id: string) => Promise<void>
-  addImage: (cardId: string, img: CardImage) => void
-  removeImage: (cardId: string, imgId: string) => void
+  addImage: (cardId: string, file: File) => Promise<void>
+  removeImage: (cardId: string, imgId: string) => Promise<void>
   addLabel: (cardId: string, label: Label) => void
   removeLabel: (cardId: string, labelId: string) => void
   moveCard: (cardId: string, fromCol: string, toCol: string, toIndex: number) => Promise<void>
@@ -45,6 +45,12 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     const columns: Column[] = cols.map((col) => ({
       id: col.id, title: col.title,
       cardIds: cards.filter((c) => c.column_id === col.id).map((c) => c.id),
+    }))
+    const imgs = await api.listCardImages()
+    await Promise.all(imgs.map(async (im) => {
+      if (!cardMap[im.card_id]) return
+      const url = await api.signedImageUrl(im.storage_path)
+      cardMap[im.card_id].images.push({ id: im.id, storagePath: im.storage_path, dataUrl: url, name: im.name })
     }))
     set({ columns, cards: cardMap, loaded: true })
   },
@@ -104,13 +110,23 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       columns: prev.columns.map((c) => ({ ...c, cardIds: c.cardIds.filter((x) => x !== id) })),
       openCardId: prev.openCardId === id ? null : prev.openCardId,
     })
+    await api.deleteCardImagesByCard(id)
     try { await api.deleteCard(id) } catch { set({ cards: prev.cards, columns: prev.columns }) }
   },
 
-  addImage: (cardId, img) =>
-    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], images: [...s.cards[cardId].images, img] } } })),
-  removeImage: (cardId, imgId) =>
-    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], images: s.cards[cardId].images.filter((i) => i.id !== imgId) } } })),
+  addImage: async (cardId, file: File) => {
+    const userId = useAuthStore.getState().user!.id
+    const row = await api.uploadCardImage(userId, cardId, file)
+    const url = await api.signedImageUrl(row.storage_path)
+    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId],
+      images: [...s.cards[cardId].images, { id: row.id, storagePath: row.storage_path, dataUrl: url, name: row.name }] } } }))
+  },
+  removeImage: async (cardId, imgId) => {
+    const img = get().cards[cardId].images.find((i) => i.id === imgId)
+    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId],
+      images: s.cards[cardId].images.filter((i) => i.id !== imgId) } } }))
+    if (img) await api.deleteCardImage({ id: img.id, storage_path: img.storagePath })
+  },
   addLabel: (cardId, label) => {
     set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], labels: [...s.cards[cardId].labels, label] } } }))
     void api.updateCard(cardId, { labels: get().cards[cardId].labels })
