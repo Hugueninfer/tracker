@@ -116,10 +116,10 @@ export function HabitTracker() {
       {/* sidebar column */}
       <div className="flex flex-col gap-5">
         <Card className="bg-accent-tint flex-1 flex flex-col">
-          <DailyQuote />
-          <div className="mt-auto">
-            <DailySummary />
+          <div className="flex-1 flex flex-col justify-center">
+            <DailyQuote />
           </div>
+          <DailySummary />
         </Card>
       </div>
 
