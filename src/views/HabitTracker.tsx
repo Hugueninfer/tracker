@@ -4,6 +4,7 @@ import { Button } from '@/components/Button'
 import { Card, CardHeader } from '@/components/Card'
 import { HabitCard } from '@/components/HabitCard'
 import { HabitHeatmap } from '@/components/HabitHeatmap'
+import { DailyQuote } from '@/components/DailyQuote'
 import { useHabitStore } from '@/store/habitStore'
 
 const EMOJIS = ['📚', '🛒', '🥦', '📖', '🏊', '🏋️', '🧘', '💧', '🏃', '🎯']
@@ -94,6 +95,11 @@ export function HabitTracker() {
               </div>
             </div>
           )}
+        </Card>
+
+        {/* daily quote */}
+        <Card tint="cream">
+          <DailyQuote />
         </Card>
 
         {/* habit grid */}
