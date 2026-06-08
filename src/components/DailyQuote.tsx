@@ -1,6 +1,7 @@
 import { Quote } from 'lucide-react'
 
-// Frases curadas em pt-BR. Rotação diária determinística (mesma frase o dia todo).
+// Frases motivadoras em pt-BR (fonte local — sem API externa, sem CORS, offline).
+// Rotação diária determinística: mesma frase o dia inteiro, muda a cada dia.
 const QUOTES: { text: string; author: string }[] = [
   { text: 'O sucesso é a soma de pequenos esforços repetidos dia após dia.', author: 'Robert Collier' },
   { text: 'Não conte os dias, faça os dias contarem.', author: 'Muhammad Ali' },
@@ -40,7 +41,6 @@ const QUOTES: { text: string; author: string }[] = [
   { text: 'Vença a preguiça com pequenas vitórias diárias.', author: 'Anônimo' },
   { text: 'A consistência é mais importante que a intensidade.', author: 'Anônimo' },
   { text: 'Faça acontecer. Ninguém vai fazer por você.', author: 'Anônimo' },
-  { text: 'O tempo que você gosta de perder não é tempo perdido.', author: 'Bertrand Russell' },
   { text: 'Sua única limitação é aquela que você impõe em sua mente.', author: 'Napoleon Hill' },
   { text: 'Trabalhe duro em silêncio e deixe o sucesso fazer barulho.', author: 'Frank Ocean' },
   { text: 'Um pouco de progresso a cada dia soma grandes resultados.', author: 'Anônimo' },
@@ -52,12 +52,12 @@ const QUOTES: { text: string; author: string }[] = [
   { text: 'Comece pequeno, mas comece.', author: 'Anônimo' },
   { text: 'O futuro depende do que você faz hoje.', author: 'Mahatma Gandhi' },
   { text: 'Seja a melhor versão de si mesmo, um dia de cada vez.', author: 'Anônimo' },
+  { text: 'Persista. O começo é sempre o mais difícil.', author: 'Anônimo' },
 ]
 
 function dayOfYear(d: Date) {
   const start = new Date(d.getFullYear(), 0, 0)
-  const diff = d.getTime() - start.getTime()
-  return Math.floor(diff / 86400000)
+  return Math.floor((d.getTime() - start.getTime()) / 86400000)
 }
 
 export function DailyQuote() {

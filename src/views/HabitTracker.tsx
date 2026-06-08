@@ -27,9 +27,9 @@ export function HabitTracker() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* main column */}
-      <div className="flex flex-col gap-5">
+      <div className="lg:col-span-2 flex flex-col gap-5">
         {/* greeting + progress */}
         <Card>
           <div className="flex items-start justify-between flex-wrap gap-4">
@@ -97,11 +97,6 @@ export function HabitTracker() {
           )}
         </Card>
 
-        {/* daily quote */}
-        <Card tint="cream">
-          <DailyQuote />
-        </Card>
-
         {/* habit grid */}
         <Card>
           <CardHeader title="Hábitos de Hoje" action={<span>Ver detalhes</span>} />
@@ -117,10 +112,19 @@ export function HabitTracker() {
         </Card>
       </div>
 
+      {/* sidebar column */}
+      <div className="flex flex-col gap-5">
+        <Card tint="cream">
+          <DailyQuote />
+        </Card>
+      </div>
+
       {/* heatmap — full width */}
-      <Card>
-        <HabitHeatmap />
-      </Card>
+      <div className="lg:col-span-3">
+        <Card>
+          <HabitHeatmap />
+        </Card>
+      </div>
     </div>
   )
 }
