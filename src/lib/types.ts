@@ -1,6 +1,6 @@
 // Shared domain types
 
-export type ViewKey = 'habits' | 'kanban'
+export type ViewKey = 'habits' | 'kanban' | 'expenses'
 
 // ---- Habit Tracker ----
 export interface Habit {
@@ -48,3 +48,38 @@ export interface Column {
 
 // alias used by the kanban store when reading jsonb labels
 export type DBLabel = Label
+
+// ---- Expenses module ----
+export type Tint = LabelTint
+
+export interface PaymentCard {
+  id: string
+  name: string
+  tint: Tint
+}
+
+export interface ExpenseCategory {
+  id: string
+  name: string
+  tint: Tint
+}
+
+export interface Income {
+  id: string
+  month: string // YYYY-MM
+  name: string
+  amount: number
+}
+
+export interface Expense {
+  id: string
+  date: string // YYYY-MM-DD
+  month: string // YYYY-MM
+  name: string
+  categoryId: string | null
+  cardId: string | null
+  amount: number
+  installmentGroup: string | null
+  installmentIndex: number
+  installmentCount: number
+}
