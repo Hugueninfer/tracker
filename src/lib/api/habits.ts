@@ -34,7 +34,7 @@ export async function deleteHabit(id: string): Promise<void> {
 export async function addCompletion(userId: string, habitId: string, date: string): Promise<void> {
   const { error } = await supabase
     .from('habit_completions')
-    .insert({ user_id: userId, habit_id: habitId, date })
+    .upsert({ user_id: userId, habit_id: habitId, date }, { onConflict: 'habit_id,date', ignoreDuplicates: true })
   if (error) throw error
 }
 

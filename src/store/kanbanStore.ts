@@ -59,12 +59,16 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   addColumn: async (title) => {
     const userId = useAuthStore.getState().user!.id
     const position = get().columns.length
-    const row = await api.insertColumn(userId, title, position)
-    set((s) => ({ columns: [...s.columns, { id: row.id, title, cardIds: [] }] }))
+    try {
+      const row = await api.insertColumn(userId, title, position)
+      set((s) => ({ columns: [...s.columns, { id: row.id, title, cardIds: [] }] }))
+    } catch (e) { console.error('addColumn failed', e) }
   },
   renameColumn: async (id, title) => {
+    const prevTitle = get().columns.find((c) => c.id === id)?.title
     set((s) => ({ columns: s.columns.map((c) => (c.id === id ? { ...c, title } : c)) }))
-    await api.updateColumn(id, { title })
+    try { await api.updateColumn(id, { title }) }
+    catch (e) { console.error('renameColumn failed', e); if (prevTitle !== undefined) set((s) => ({ columns: s.columns.map((c) => (c.id === id ? { ...c, title: prevTitle } : c)) })) }
   },
   removeColumn: async (id) => {
     const prev = get()
@@ -84,13 +88,15 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     const userId = useAuthStore.getState().user!.id
     const col = get().columns.find((c) => c.id === columnId)
     const position = col ? col.cardIds.length : 0
-    const row = await api.insertCard(userId, columnId, title, position)
-    const card: KanbanCard = { id: row.id, title, description: '', notes: '', images: [], labels: [] }
-    set((s) => ({
-      cards: { ...s.cards, [card.id]: card },
-      columns: s.columns.map((c) => (c.id === columnId ? { ...c, cardIds: [...c.cardIds, card.id] } : c)),
-      openCardId: card.id,
-    }))
+    try {
+      const row = await api.insertCard(userId, columnId, title, position)
+      const card: KanbanCard = { id: row.id, title, description: '', notes: '', images: [], labels: [] }
+      set((s) => ({
+        cards: { ...s.cards, [card.id]: card },
+        columns: s.columns.map((c) => (c.id === columnId ? { ...c, cardIds: [...c.cardIds, card.id] } : c)),
+        openCardId: card.id,
+      }))
+    } catch (e) { console.error('addCard failed', e) }
   },
   updateCard: (id, patch) => {
     set((s) => ({ cards: { ...s.cards, [id]: { ...s.cards[id], ...patch } } }))
@@ -100,7 +106,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     if ('notes' in patch) dbPatch.notes = patch.notes
     if ('labels' in patch) dbPatch.labels = patch.labels
     if ('dueDate' in patch) dbPatch.due_date = patch.dueDate ?? null
-    if (Object.keys(dbPatch).length) void api.updateCard(id, dbPatch)
+    if (Object.keys(dbPatch).length) api.updateCard(id, dbPatch).catch((e) => console.error('updateCard failed', e))
   },
   removeCard: async (id) => {
     const prev = get()
@@ -110,33 +116,42 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       columns: prev.columns.map((c) => ({ ...c, cardIds: c.cardIds.filter((x) => x !== id) })),
       openCardId: prev.openCardId === id ? null : prev.openCardId,
     })
-    await api.deleteCardImagesByCard(id)
-    try { await api.deleteCard(id) } catch { set({ cards: prev.cards, columns: prev.columns }) }
+    try {
+      await api.deleteCard(id)
+      await api.deleteCardImagesByCard(id) // purge storage only after row delete succeeds
+    } catch (e) {
+      console.error('removeCard failed', e)
+      set({ cards: prev.cards, columns: prev.columns })
+    }
   },
 
   addImage: async (cardId, file: File) => {
     const userId = useAuthStore.getState().user!.id
-    const row = await api.uploadCardImage(userId, cardId, file)
-    const url = await api.signedImageUrl(row.storage_path)
-    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId],
-      images: [...s.cards[cardId].images, { id: row.id, storagePath: row.storage_path, dataUrl: url, name: row.name }] } } }))
+    try {
+      const row = await api.uploadCardImage(userId, cardId, file)
+      const url = await api.signedImageUrl(row.storage_path)
+      set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId],
+        images: [...s.cards[cardId].images, { id: row.id, storagePath: row.storage_path, dataUrl: url, name: row.name }] } } }))
+    } catch (e) { console.error('addImage failed', e) }
   },
   removeImage: async (cardId, imgId) => {
     const img = get().cards[cardId].images.find((i) => i.id === imgId)
-    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId],
-      images: s.cards[cardId].images.filter((i) => i.id !== imgId) } } }))
-    if (img) await api.deleteCardImage({ id: img.id, storage_path: img.storagePath })
+    set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], images: s.cards[cardId].images.filter((i) => i.id !== imgId) } } }))
+    if (!img) return
+    try { await api.deleteCardImage({ id: img.id, storage_path: img.storagePath }) }
+    catch (e) { console.error('removeImage failed', e); set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], images: [...s.cards[cardId].images, img] } } })) }
   },
   addLabel: (cardId, label) => {
     set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], labels: [...s.cards[cardId].labels, label] } } }))
-    void api.updateCard(cardId, { labels: get().cards[cardId].labels })
+    api.updateCard(cardId, { labels: get().cards[cardId].labels }).catch((e) => console.error('label update failed', e))
   },
   removeLabel: (cardId, labelId) => {
     set((s) => ({ cards: { ...s.cards, [cardId]: { ...s.cards[cardId], labels: s.cards[cardId].labels.filter((l) => l.id !== labelId) } } }))
-    void api.updateCard(cardId, { labels: get().cards[cardId].labels })
+    api.updateCard(cardId, { labels: get().cards[cardId].labels }).catch((e) => console.error('label update failed', e))
   },
 
   moveCard: async (cardId, _fromCol, toCol, toIndex) => {
+    const prev = get().columns
     set((s) => {
       const columns = s.columns.map((c) => ({ ...c, cardIds: [...c.cardIds] }))
       for (const c of columns) {
@@ -147,9 +162,19 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       if (target) target.cardIds.splice(Math.min(toIndex, target.cardIds.length), 0, cardId)
       return { columns }
     })
-    const target = get().columns.find((c) => c.id === toCol)
-    const newIndex = target ? target.cardIds.indexOf(cardId) : toIndex
-    await api.setCardColumnAndPosition(cardId, toCol, newIndex)
+    try {
+      const target = get().columns.find((c) => c.id === toCol)
+      if (!target) return
+      const newIndex = target.cardIds.indexOf(cardId)
+      await api.setCardColumnAndPosition(cardId, toCol, newIndex)
+      // persist sibling positions in the target column so order survives reload
+      await Promise.all(
+        target.cardIds.map((cid, i) => (cid === cardId ? null : api.updateCard(cid, { position: i })))
+      )
+    } catch (e) {
+      console.error('moveCard failed', e)
+      set({ columns: prev })
+    }
   },
 
   openCard: (id) => set({ openCardId: id }),
