@@ -3,7 +3,6 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Card, CardHeader } from '@/components/Card'
 import { HabitCard } from '@/components/HabitCard'
-import { Calendar } from '@/components/Calendar'
 import { HabitHeatmap } from '@/components/HabitHeatmap'
 import { useHabitStore } from '@/store/habitStore'
 
@@ -27,9 +26,9 @@ export function HabitTracker() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div className="flex flex-col gap-5">
       {/* main column */}
-      <div className="lg:col-span-2 flex flex-col gap-5">
+      <div className="flex flex-col gap-5">
         {/* greeting + progress */}
         <Card>
           <div className="flex items-start justify-between flex-wrap gap-4">
@@ -112,19 +111,10 @@ export function HabitTracker() {
         </Card>
       </div>
 
-      {/* sidebar column */}
-      <div className="flex flex-col gap-5">
-        <Card>
-          <Calendar />
-        </Card>
-      </div>
-
       {/* heatmap — full width */}
-      <div className="lg:col-span-3">
-        <Card>
-          <HabitHeatmap />
-        </Card>
-      </div>
+      <Card>
+        <HabitHeatmap />
+      </Card>
     </div>
   )
 }
