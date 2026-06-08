@@ -83,3 +83,8 @@ export async function deleteExpense(id: string): Promise<void> {
   const { error } = await supabase.from('expenses').delete().eq('id', id)
   if (error) throw error
 }
+// Deletes every installment row sharing the same group (all adjacent months).
+export async function deleteExpenseGroup(groupId: string): Promise<void> {
+  const { error } = await supabase.from('expenses').delete().eq('installment_group', groupId)
+  if (error) throw error
+}

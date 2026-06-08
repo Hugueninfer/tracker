@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { X, Plus, Trash2 } from 'lucide-react'
 import { useExpensesStore } from '@/store/expensesStore'
-import { labelTintClass, LABEL_TINTS } from '@/components/labelStyles'
-import type { Tint } from '@/lib/types'
+import { EXPENSE_COLORS, colorById } from '@/lib/expenseColors'
 import { cx } from '@/lib/utils'
 
 export function ManageModal({ onClose }: { onClose: () => void }) {
@@ -20,10 +19,17 @@ export function ManageModal({ onClose }: { onClose: () => void }) {
   const [newCard, setNewCard] = useState('')
   const [newCat, setNewCat] = useState('')
 
-  const TintPicker = ({ value, onPick }: { value: Tint; onPick: (t: Tint) => void }) => (
-    <div className="flex gap-1">
-      {LABEL_TINTS.map((t) => (
-        <button key={t} onClick={() => onPick(t)} className={cx('h-5 w-5 rounded-full', labelTintClass[t], value === t && 'ring-2 ring-ink')} aria-label={`Cor ${t}`} />
+  const TintPicker = ({ value, onPick }: { value: string; onPick: (t: string) => void }) => (
+    <div className="flex flex-wrap gap-1 max-w-[140px] justify-end">
+      {EXPENSE_COLORS.map((c) => (
+        <button
+          key={c.id}
+          onClick={() => onPick(c.id)}
+          title={c.label}
+          style={{ backgroundColor: c.bg }}
+          className={cx('h-5 w-5 rounded-full transition-transform', value === c.id ? 'ring-2 ring-ink scale-110' : 'hover:scale-110')}
+          aria-label={`Cor ${c.label}`}
+        />
       ))}
     </div>
   )
@@ -43,7 +49,8 @@ export function ManageModal({ onClose }: { onClose: () => void }) {
           <div className="flex flex-col gap-2">
             {cards.map((c) => (
               <div key={c.id} className="flex items-center gap-2 bg-cardAlt rounded-badge px-3 py-2">
-                <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && renameCard(c.id, e.target.value)} className="bg-transparent outline-none text-item flex-1" />
+                <span className="h-6 w-6 rounded-badge shrink-0" style={{ backgroundColor: colorById(c.tint).bg }} />
+                <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && renameCard(c.id, e.target.value)} className="bg-transparent outline-none text-item flex-1 min-w-0" />
                 <TintPicker value={c.tint} onPick={(t) => setCardTint(c.id, t)} />
                 <button onClick={() => removeCard(c.id)} className="text-muted hover:text-tint-coral" aria-label="Excluir cartão"><Trash2 size={15} /></button>
               </div>
@@ -51,7 +58,7 @@ export function ManageModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex gap-2 mt-2">
             <input value={newCard} onChange={(e) => setNewCard(e.target.value)} placeholder="Novo cartão" className="flex-1 bg-cardAlt rounded-pill px-4 h-10 text-item outline-none" />
-            <button onClick={() => { if (newCard.trim()) { addCard(newCard.trim(), 'accent'); setNewCard('') } }} className="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center" aria-label="Adicionar cartão"><Plus size={18} /></button>
+            <button onClick={() => { if (newCard.trim()) { addCard(newCard.trim(), EXPENSE_COLORS[1].id); setNewCard('') } }} className="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center" aria-label="Adicionar cartão"><Plus size={18} /></button>
           </div>
         </section>
 
@@ -61,7 +68,8 @@ export function ManageModal({ onClose }: { onClose: () => void }) {
           <div className="flex flex-col gap-2">
             {categories.map((c) => (
               <div key={c.id} className="flex items-center gap-2 bg-cardAlt rounded-badge px-3 py-2">
-                <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && renameCategory(c.id, e.target.value)} className="bg-transparent outline-none text-item flex-1" />
+                <span className="h-6 w-6 rounded-badge shrink-0" style={{ backgroundColor: colorById(c.tint).bg }} />
+                <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && renameCategory(c.id, e.target.value)} className="bg-transparent outline-none text-item flex-1 min-w-0" />
                 <TintPicker value={c.tint} onPick={(t) => setCategoryTint(c.id, t)} />
                 <button onClick={() => removeCategory(c.id)} className="text-muted hover:text-tint-coral" aria-label="Excluir categoria"><Trash2 size={15} /></button>
               </div>
@@ -69,7 +77,7 @@ export function ManageModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex gap-2 mt-2">
             <input value={newCat} onChange={(e) => setNewCat(e.target.value)} placeholder="Nova categoria" className="flex-1 bg-cardAlt rounded-pill px-4 h-10 text-item outline-none" />
-            <button onClick={() => { if (newCat.trim()) { addCategory(newCat.trim(), 'sage'); setNewCat('') } }} className="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center" aria-label="Adicionar categoria"><Plus size={18} /></button>
+            <button onClick={() => { if (newCat.trim()) { addCategory(newCat.trim(), EXPENSE_COLORS[4].id); setNewCat('') } }} className="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center" aria-label="Adicionar categoria"><Plus size={18} /></button>
           </div>
         </section>
       </div>

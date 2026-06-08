@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { PaymentCard, ExpenseCategory, Income, Expense, Tint } from '@/lib/types'
+import type { PaymentCard, ExpenseCategory, Income, Expense } from '@/lib/types'
 import type { DBExpense } from '@/lib/db-types'
 import { useAuthStore } from '@/store/authStore'
 import { currentMonth, buildInstallments, monthOf } from '@/lib/expenseMonth'
@@ -25,13 +25,13 @@ interface ExpensesState {
   loadMonth: (month: string) => Promise<void>
   setMonth: (month: string) => Promise<void>
   // cards / categories (global)
-  addCard: (name: string, tint: Tint) => Promise<PaymentCard | undefined>
+  addCard: (name: string, tint: string) => Promise<PaymentCard | undefined>
   renameCard: (id: string, name: string) => Promise<void>
-  setCardTint: (id: string, tint: Tint) => Promise<void>
+  setCardTint: (id: string, tint: string) => Promise<void>
   removeCard: (id: string) => Promise<void>
-  addCategory: (name: string, tint: Tint) => Promise<ExpenseCategory | undefined>
+  addCategory: (name: string, tint: string) => Promise<ExpenseCategory | undefined>
   renameCategory: (id: string, name: string) => Promise<void>
-  setCategoryTint: (id: string, tint: Tint) => Promise<void>
+  setCategoryTint: (id: string, tint: string) => Promise<void>
   removeCategory: (id: string) => Promise<void>
   // incomes (month)
   addIncome: (name: string, amount: number) => Promise<void>
@@ -193,8 +193,16 @@ export const useExpensesStore = create<ExpensesState>((set, get) => ({
   },
   removeExpense: async (id) => {
     const prev = get().expenses
-    set((s) => ({ expenses: s.expenses.filter((e) => e.id !== id) }))
-    try { await api.deleteExpense(id) } catch (e) { console.error('removeExpense failed', e); set({ expenses: prev }) }
+    const target = prev.find((e) => e.id === id)
+    const group = target?.installmentGroup ?? null
+    // installment purchase -> remove the whole group (every adjacent month)
+    set((s) => ({
+      expenses: s.expenses.filter((e) => (group ? e.installmentGroup !== group : e.id !== id)),
+    }))
+    try {
+      if (group) await api.deleteExpenseGroup(group)
+      else await api.deleteExpense(id)
+    } catch (e) { console.error('removeExpense failed', e); set({ expenses: prev }) }
   },
 
   reset: () => set({ cards: [], categories: [], incomes: [], expenses: [], loaded: false, selectedMonth: currentMonth() }),

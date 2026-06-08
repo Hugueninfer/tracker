@@ -1,8 +1,7 @@
 import { useExpensesStore } from '@/store/expensesStore'
 import { perCard, NO_CARD, sumAmounts } from '@/lib/expenseCalc'
-import { labelTintClass } from '@/components/labelStyles'
+import { colorById } from '@/lib/expenseColors'
 import { formatBRL } from '@/lib/money'
-import { cx } from '@/lib/utils'
 
 export function CardTotals() {
   const cards = useExpensesStore((s) => s.cards)
@@ -11,7 +10,7 @@ export function CardTotals() {
   const totals = perCard(expenses)
   const rows = [
     ...cards.map((c) => ({ id: c.id, name: c.name, tint: c.tint, value: totals[c.id] ?? 0 })),
-    ...(totals[NO_CARD] ? [{ id: NO_CARD, name: 'Sem cartão', tint: 'cream' as const, value: totals[NO_CARD] }] : []),
+    ...(totals[NO_CARD] ? [{ id: NO_CARD, name: 'Sem cartão', tint: '__none__', value: totals[NO_CARD] }] : []),
   ].filter((r) => r.value > 0)
   const total = sumAmounts(expenses)
 
@@ -24,7 +23,11 @@ export function CardTotals() {
         <div className="flex flex-col gap-2.5">
           {rows.map((r) => (
             <div key={r.id} className="flex items-center justify-between gap-3">
-              <span className={cx('text-micro font-semibold px-2.5 py-1 rounded-pill', labelTintClass[r.tint])}>{r.name}</span>
+              {r.id === NO_CARD ? (
+                <span className="text-micro font-semibold px-2.5 py-1 rounded-pill bg-cardAlt text-muted">{r.name}</span>
+              ) : (
+                <span className="text-micro font-semibold px-2.5 py-1 rounded-pill" style={{ backgroundColor: colorById(r.tint).bg, color: colorById(r.tint).fg }}>{r.name}</span>
+              )}
               <span className="text-item font-semibold">{formatBRL(r.value)}</span>
             </div>
           ))}

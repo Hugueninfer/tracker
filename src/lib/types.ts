@@ -55,13 +55,13 @@ export type Tint = LabelTint
 export interface PaymentCard {
   id: string
   name: string
-  tint: Tint
+  tint: string // expense color id (see lib/expenseColors)
 }
 
 export interface ExpenseCategory {
   id: string
   name: string
-  tint: Tint
+  tint: string // expense color id (see lib/expenseColors)
 }
 
 export interface Income {

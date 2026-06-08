@@ -1,4 +1,4 @@
-import type { LabelTint, Tint } from './types'
+import type { LabelTint } from './types'
 
 export interface DBHabit {
   id: string
@@ -61,7 +61,7 @@ export interface DBPaymentCard {
   id: string
   user_id: string
   name: string
-  tint: Tint
+  tint: string
   position: number
 }
 
@@ -69,7 +69,7 @@ export interface DBExpenseCategory {
   id: string
   user_id: string
   name: string
-  tint: Tint
+  tint: string
   position: number
 }
 
