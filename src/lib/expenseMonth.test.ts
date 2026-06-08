@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { monthOf, addMonths, monthLabel, currentMonth, buildInstallments } from './expenseMonth'
+import { monthOf, addMonths, monthLabel, buildInstallments } from './expenseMonth'
 
 describe('monthOf', () => {
   it('extracts YYYY-MM from a date string', () => {
