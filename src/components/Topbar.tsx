@@ -5,6 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 const crumb: Record<string, string> = {
   habits: 'Hábitos',
   kanban: 'Kanban',
+  expenses: 'Gastos',
 }
 
 /** Light chrome header: breadcrumb + search (no macOS dots per request). */

@@ -1,4 +1,4 @@
-import { LayoutGrid, CalendarCheck } from 'lucide-react'
+import { LayoutGrid, CalendarCheck, Wallet } from 'lucide-react'
 import type { ViewKey } from '@/lib/types'
 import { useUIStore } from '@/store/uiStore'
 import { ProfileMenu } from '@/components/ProfileMenu'
@@ -7,6 +7,7 @@ import { cx } from '@/lib/utils'
 const items: { key: ViewKey; label: string; icon: typeof LayoutGrid }[] = [
   { key: 'habits', label: 'Hábitos', icon: CalendarCheck },
   { key: 'kanban', label: 'Kanban', icon: LayoutGrid },
+  { key: 'expenses', label: 'Gastos', icon: Wallet },
 ]
 
 export function Sidebar() {

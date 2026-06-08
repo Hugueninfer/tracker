@@ -56,3 +56,42 @@ export interface DBProfile {
   name: string
   email: string
 }
+
+export interface DBPaymentCard {
+  id: string
+  user_id: string
+  name: string
+  tint: string
+  position: number
+}
+
+export interface DBExpenseCategory {
+  id: string
+  user_id: string
+  name: string
+  tint: string
+  position: number
+}
+
+export interface DBIncome {
+  id: string
+  user_id: string
+  month: string
+  name: string
+  amount: number
+}
+
+export interface DBExpense {
+  id: string
+  user_id: string
+  date: string
+  month: string
+  name: string
+  category_id: string | null
+  card_id: string | null
+  amount: number
+  installment_group: string | null
+  installment_index: number
+  installment_count: number
+  position: number
+}
