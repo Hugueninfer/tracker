@@ -68,8 +68,8 @@ export function DailyQuote() {
         <Quote size={16} className="text-accent" />
         <span className="font-semibold">Frase do dia</span>
       </div>
-      <p className="text-cardTitle font-semibold leading-snug">{q.text}</p>
-      <p className="text-meta text-muted mt-2">— {q.author}</p>
+      <p className="text-lg font-semibold leading-snug">{q.text}</p>
+      <p className="text-meta text-muted mt-3">— {q.author}</p>
     </div>
   )
 }
