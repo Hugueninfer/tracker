@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Settings, LogOut, ChevronUp } from 'lucide-react'
 import { useProfileStore, logout } from '@/store/profileStore'
 import { SettingsModal } from '@/components/SettingsModal'
@@ -11,6 +11,8 @@ function initials(name: string) {
 export function ProfileMenu() {
   const name = useProfileStore((s) => s.name)
   const email = useProfileStore((s) => s.email)
+  const load = useProfileStore((s) => s.load)
+  useEffect(() => { load() }, [load])
   const [open, setOpen] = useState(false)
   const [settings, setSettings] = useState(false)
 
