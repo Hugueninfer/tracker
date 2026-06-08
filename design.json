@@ -1,0 +1,131 @@
+{
+  "designSystem": {
+    "name": "Hebats Dashboard Style",
+    "summary": "Warm, soft-pastel productivity dashboard. Light neutral canvas hosts floating white/tinted cards with heavy corner radii, generous whitespace, friendly illustrated icons/emoji, and one confident accent color (warm orange) used sparingly for CTAs and highlights. Feels calm, approachable, 'morning routine' friendly rather than corporate/dense.",
+
+    "moodKeywords": ["calm", "friendly", "warm", "soft", "rounded", "airy", "approachable", "playful-but-clean", "morning routine", "wellness app"],
+
+    "layout": {
+      "structure": "Multi-column dashboard grid inside a browser-chrome frame (macOS traffic-light dots, breadcrumb nav, search). Left: greeting + actions + calendar widget + promo card. Center: stacked widgets (Weather, Should Do, Running Competition). Right-center: Today's Todos list. Far right: stacked promo/integration cards + Analytics module spanning bottom.",
+      "grid": "4-column asymmetric grid; columns vary in width (narrow sidebar ~260px, wider center/content columns ~330-450px). Cards align to a consistent baseline grid with equal gutter spacing.",
+      "containerStyle": "Entire dashboard sits in a rounded outer frame (browser window) with a subtle border, floating on an off-white page background.",
+      "whitespace": "Generous — cards never touch; consistent ~20-24px gutters between columns and ~16-20px between stacked cards.",
+      "alignment": "Left-aligned text blocks throughout; icons/avatars align to top-left of their card; action buttons/links (e.g. 'View Details') align top-right of card headers."
+    },
+
+    "colorPalette": {
+      "approach": "Mostly neutral/desaturated base with each card given its own soft pastel tint to differentiate function, plus a single warm accent for primary actions and emphasis.",
+      "background": {
+        "page": "#F3F2F0 (warm light gray)",
+        "cardNeutral": "#FFFFFF / #FAFAF9"
+      },
+      "accentPrimary": {
+        "color": "#F4A261 / #F2994A (warm orange/peach)",
+        "usage": "Primary buttons ('+ New Habits'), active calendar date highlight, progress bar fill, key data emphasis (e.g. selected chart bar), small accent icons"
+      },
+      "tintedCardBackgrounds": {
+        "weatherCard": "#FBE9C6 (soft buttery yellow)",
+        "spotifyCard": "#1DB954-tinted dark/green accent on white",
+        "integrationsPromoCard": "#F08080 / #EE6B6E (soft coral red)",
+        "positiveHabitsBadge": "#7C9070 / sage green",
+        "habitsWrappedCard": "#2B2B2B (near-black) with confetti illustration",
+        "syncAppPromoCard": "#FFF6E5 (pale cream)"
+      },
+      "textColors": {
+        "primary": "#1F1F1F / #2A2A2A (near-black, for headings)",
+        "secondary": "#8C8C8C / #9B9B9B (muted gray, for meta/timestamps/labels)",
+        "onAccent": "#FFFFFF",
+        "linkOrAction": "#1F1F1F with low-emphasis gray for 'View Details' links"
+      },
+      "borderAndDividers": "Very light gray (#ECECEA), 1px hairlines, used sparingly between list rows",
+      "principle": "Never more than one saturated accent per view; pastel tints denote category/context, not hierarchy; status conveyed through soft color (green check = done) not harsh red/green pairs"
+    },
+
+    "typography": {
+      "fontFamily": "Geometric/humanist sans-serif (e.g. 'General Sans', 'Inter', 'Plus Jakarta Sans', or similar rounded-terminal sans)",
+      "scale": {
+        "pageTitle": "28-32px / Bold / tight line-height — e.g. 'Happy Tuesday'",
+        "cardTitle": "15-17px / Semibold — e.g. 'Weather', 'Today's Todos'",
+        "itemTitle": "14-15px / Semibold — e.g. 'Study', 'Groceries'",
+        "metaText": "12-13px / Regular / muted gray — timestamps, locations, subtitles",
+        "microLabel": "11-12px / Medium / uppercase-or-caps optional — small badges, stat labels",
+        "statNumber": "20-24px / Bold — e.g. '+58,2%', '12°C'"
+      },
+      "lineHeight": "Relaxed (1.4-1.5) for readability and airy feel",
+      "letterSpacing": "Default to slightly tight on large headings, normal elsewhere",
+      "principle": "Strong weight contrast between bold titles and light/regular meta text creates hierarchy without needing many colors"
+    },
+
+    "spacingAndSizing": {
+      "baseUnit": "8px grid",
+      "cardPadding": "20-24px internal padding on all sides",
+      "interCardGap": "16-20px vertical, 20-24px horizontal between columns",
+      "borderRadius": {
+        "outerFrame": "20-24px",
+        "cards": "20-28px (large, soft, 'pillowy' radius)",
+        "buttons": "999px / fully pill-shaped for primary CTAs, 12-16px for secondary rectangular buttons",
+        "iconContainers": "12-16px rounded squares for list-item icon badges",
+        "avatarsAndChips": "fully circular"
+      },
+      "iconSizing": "Small functional icons ~16px; list-item illustrated icon badges ~36-40px square; weather/illustration art scaled larger (~120-150px) as decorative focal points"
+    },
+
+    "componentStyles": {
+      "buttons": {
+        "primary": "Pill-shaped, solid warm-orange fill, white bold label, centered icon+text (e.g. '+ New Habits'), medium height (~44px), no visible border, soft drop shadow optional",
+        "secondary": "Pill or rounded-rectangle, white/transparent fill, thin neutral border, dark text, same height as primary for visual pairing (e.g. 'Browse Popular Habits')",
+        "darkCTA": "Black/near-black pill button on colored cards for contrast (e.g. 'Link Account', 'View')"
+      },
+      "cards": {
+        "general": "White or pastel-tinted rounded rectangles, no harsh borders — separation achieved via subtle shadow or background contrast against page. Header row = title (bold, dark) + small muted action link ('View Details') aligned right.",
+        "elevation": "Soft, diffuse drop shadows (low opacity, large blur, small offset) — never sharp/hard shadows",
+        "illustrationCards": "Feature a friendly flat-illustration (umbrella in rain, map pin, character at laptop) anchored bottom or center-right of the card to add warmth/personality"
+      },
+      "calendar": {
+        "style": "Minimal grid of circular date cells; current/selected date = solid orange filled circle with white text; date with an event = thin orange ring outline; other dates = plain text on transparent background; month nav via small chevron buttons; small percentage delta caption below ('+3,2% from last month')"
+      },
+      "listItems": {
+        "todoRow": "Horizontal row: rounded-square illustrated/emoji icon badge (left) + title (bold) and meta line with small clock/location icons (below) + checkbox/checkmark indicator (right). Completed items show a filled green circular checkmark; pending items show an empty light-gray rounded checkbox. Completed item titles may render in muted/strikethrough-light style.",
+        "metaIcons": "Inline small clock and pin/location glyphs preceding meta text, consistent muted-gray color"
+      },
+      "badgesAndChips": {
+        "style": "Small rounded-rectangle or pill chips with soft background tint and bold percentage/number (e.g. green 'Positive Habits +58,2%' chip with emoji)",
+        "usage": "Surface quick stats inline within larger analytic modules"
+      },
+      "charts": {
+        "style": "Minimal vertical bar chart, thin rounded-top bars, neutral light-gray bars for inactive categories and a single solid orange bar to highlight the top/selected category, small emoji or icon floating above the highlighted bar, axis labels in small muted gray text, light dropdown filter ('December ▾') and search input in card header"
+      },
+      "promoCards": {
+        "style": "Bold single-color or dark-illustration cards used for upsells/integrations (Spotify connect, 'More Integrations', 'Habits Wrapped 2023') — large bold heading, short supporting copy, single dark or white pill CTA button, optional decorative icon/illustration/confetti graphic"
+      },
+      "avatarAndProfileElements": {
+        "style": "Friendly flat-illustrated character avatars (e.g. person at laptop) used in promotional sidebar card to humanize the product"
+      },
+      "navigationChrome": {
+        "style": "macOS-style traffic-light window dots top-left, breadcrumb-style page title ('Dashboard / Schedule') with muted secondary segment, centered search icon, right-aligned cluster of small utility icons and circular profile avatar"
+      }
+    },
+
+    "iconographyAndIllustration": {
+      "style": "Mix of emoji (🌤️🏋️🛒📖🏊) for personality/quick-scan recognition and simple line icons (clock, pin, chevron, search) for UI chrome. Larger decorative illustrations are flat, soft-colored, slightly whimsical (umbrella+rain scene, map with pin, character at laptop, gift box with confetti).",
+      "principle": "Icons reinforce content meaning instantly (visual shorthand for habit categories); illustrations add emotional warmth to otherwise data-dense areas"
+    },
+
+    "motionAndState": {
+      "hoverAndFocus": "Assume subtle elevation/scale increase on interactive cards and buttons; checkboxes animate fill on completion (light gray → green filled circle with check)",
+      "emphasisPattern": "Use color (orange highlight) and scale, never harsh borders, to indicate selection/active state — e.g. selected calendar date, active chart bar"
+    },
+
+    "designPrinciples": [
+      "One dominant accent color (warm orange) — everything else stays neutral or pastel so the accent always reads as 'primary action / important'.",
+      "Generous rounded corners and soft shadows everywhere — nothing sharp, nothing flat-bordered; the whole UI should feel 'pillowy' and touchable.",
+      "Whitespace over density — let cards breathe; never cram more than a handful of data points per module.",
+      "Personality through illustration/emoji, not through color noise — keep the palette calm and let friendly graphics carry warmth.",
+      "Clear two-tier text hierarchy (bold dark headings vs. muted gray meta) so screens stay scannable without heavy color-coding.",
+      "Consistent card anatomy — every module has a bold title + secondary 'View Details' link in the same top-row position, training the eye to scan predictably.",
+      "Status communicated softly — green circular checks for completion, orange rings/fills for 'today/active', muted gray for 'inactive/future' — avoiding alarming reds except for a single intentional coral promo accent."
+    ],
+
+    "applicationGuidance": "When generating new screens or components for this app: default to a light warm-gray page background with white or pastel-tinted cards (radius 20px+), reserve solid warm-orange fills for the single most important action per view, pair bold dark sans-serif headings with smaller muted-gray meta text, illustrate list items with rounded-square emoji/icon badges, and finish empty corners or promo slots with friendly flat illustrations rather than stock imagery or dense data tables."
+  }
+}

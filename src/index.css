@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- design tokens (light) ---- */
+:root {
+  color-scheme: light;
+  --c-page: 243 242 240;       /* #F3F2F0 */
+  --c-card: 255 255 255;       /* #FFFFFF */
+  --c-card-alt: 250 250 249;   /* #FAFAF9 */
+  --c-ink: 31 31 31;           /* #1F1F1F */
+  --c-ink-soft: 42 42 42;      /* #2A2A2A */
+  --c-muted: 140 140 140;      /* #8C8C8C */
+  --c-hairline: 236 236 234;   /* #ECECEA */
+  --c-accent: 242 153 74;      /* #F2994A */
+  --c-accent-soft: 244 162 97; /* #F4A261 */
+  --c-accent-tint: 252 235 218;/* #FCEBDA */
+  --c-done: 95 175 107;        /* #5FAF6B */
+  --shadow-card: 0 8px 30px -12px rgba(31, 31, 31, 0.12);
+  --shadow-card-hover: 0 14px 40px -12px rgba(31, 31, 31, 0.18);
+  --shadow-drawer: -12px 0 50px -12px rgba(31, 31, 31, 0.2);
+}
+
+/* ---- design tokens (dark) ---- */
+.dark {
+  color-scheme: dark;
+  --c-page: 22 22 26;          /* #16161A */
+  --c-card: 33 33 38;          /* #212126 */
+  --c-card-alt: 44 44 50;      /* #2C2C32 */
+  --c-ink: 237 237 235;        /* near white */
+  --c-ink-soft: 214 214 212;
+  --c-muted: 148 148 156;
+  --c-hairline: 58 58 64;
+  --c-accent: 242 153 74;      /* keep brand orange */
+  --c-accent-soft: 244 162 97;
+  --c-accent-tint: 64 49 38;   /* warm dark fill for hover/badges */
+  --c-done: 102 187 115;
+  --shadow-card: 0 8px 30px -12px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 14px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-drawer: -12px 0 50px -12px rgba(0, 0, 0, 0.65);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--c-page));
+  color: rgb(var(--c-ink));
+  font-family: theme('fontFamily.sans');
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Tiptap rich text content styling */
+.tiptap {
+  outline: none;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgb(var(--c-ink));
+}
+.tiptap p {
+  margin: 0 0 0.5rem;
+}
+.tiptap h1,
+.tiptap h2,
+.tiptap h3 {
+  font-weight: 700;
+  margin: 0.75rem 0 0.4rem;
+  line-height: 1.25;
+}
+.tiptap h1 { font-size: 20px; }
+.tiptap h2 { font-size: 17px; }
+.tiptap h3 { font-size: 15px; }
+.tiptap ul,
+.tiptap ol {
+  padding-left: 1.2rem;
+  margin: 0 0 0.5rem;
+}
+.tiptap ul { list-style: disc; }
+.tiptap ol { list-style: decimal; }
+.tiptap a {
+  color: rgb(var(--c-accent));
+  text-decoration: underline;
+}
+.tiptap ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.2rem;
+}
+.tiptap ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.tiptap ul[data-type='taskList'] li > label {
+  margin-top: 0.15rem;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: rgb(var(--c-muted));
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* board scrollbar */
+.board-scroll::-webkit-scrollbar { height: 10px; }
+.board-scroll::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-hairline));
+  border-radius: 999px;
+}
