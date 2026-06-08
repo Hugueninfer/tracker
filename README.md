@@ -99,5 +99,4 @@ src/
 supabase/
   migrations/   schema + RLS + storage
   seed.ts       seed da conta-dono
-docs/superpowers/  spec e plano de implementação
 ```
