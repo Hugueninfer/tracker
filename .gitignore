@@ -1,3 +1,24 @@
 node_modules
 dist
+
+# logs
 *.log
+
+# env / secrets
+.env.local
+.env*.local
+
+# build artifacts
+tsconfig.tsbuildinfo
+
+# editor / tooling local state
+.claude/
+.vscode/
+.idea/
+
+# supabase CLI local cache
+supabase/.temp/
+supabase/.branches/
+
+# internal planning docs (not part of the product)
+docs/superpowers/

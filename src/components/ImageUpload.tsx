@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 import { ImagePlus, X } from 'lucide-react'
 import type { CardImage } from '@/lib/types'
-import { fileToDataUrl, uid, cx } from '@/lib/utils'
+import { cx } from '@/lib/utils'
 
 interface Props {
   images: CardImage[]
-  onAdd: (img: CardImage) => void
+  onAdd: (file: File) => void
   onRemove: (id: string) => void
 }
 
@@ -13,12 +13,11 @@ export function ImageUpload({ images, onAdd, onRemove }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
 
-  const handleFiles = async (files: FileList | null) => {
+  const handleFiles = (files: FileList | null) => {
     if (!files) return
     for (const file of Array.from(files)) {
       if (!file.type.startsWith('image/')) continue
-      const dataUrl = await fileToDataUrl(file)
-      onAdd({ id: uid(), dataUrl, name: file.name })
+      onAdd(file)
     }
   }
 

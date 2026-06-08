@@ -1,117 +1,94 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import type { Habit } from '@/lib/types'
-import { uid, todayISO } from '@/lib/utils'
+import { todayISO, uid } from '@/lib/utils'
+import { computeStreak, isDoneToday } from '@/lib/streak'
+import { useAuthStore } from '@/store/authStore'
+import * as api from '@/lib/api/habits'
 
 interface HabitState {
   habits: Habit[]
-  selectedDate: string // ISO yyyy-mm-dd
-  addHabit: (h: Omit<Habit, 'id' | 'doneToday' | 'streak' | 'completedDates'>) => void
-  toggleHabit: (id: string) => void
-  removeHabit: (id: string) => void
+  selectedDate: string
+  loaded: boolean
+  load: () => Promise<void>
+  addHabit: (h: { emoji: string; title: string; meta: string }) => Promise<void>
+  toggleHabit: (id: string) => Promise<void>
+  removeHabit: (id: string) => Promise<void>
   setSelectedDate: (iso: string) => void
+  reset: () => void
 }
 
-// Generate plausible past completions over the last `days` at ~`rate` density.
-// Deterministic per seed so the heatmap looks stable across reloads.
-function history(days: number, rate: number, seed: number): string[] {
-  const out: string[] = []
-  let s = seed
-  const rnd = () => {
-    s = (s * 1103515245 + 12345) & 0x7fffffff
-    return s / 0x7fffffff
-  }
-  const now = new Date()
-  for (let i = 0; i < days; i++) {
-    if (rnd() < rate) {
-      const d = new Date(now)
-      d.setDate(now.getDate() - i)
-      out.push(d.toISOString().slice(0, 10))
+function build(dbHabits: { id: string; emoji: string; title: string; meta: string; position: number }[],
+  completionsByHabit: Map<string, string[]>): Habit[] {
+  return dbHabits.map((h) => {
+    const dates = completionsByHabit.get(h.id) ?? []
+    return {
+      id: h.id,
+      emoji: h.emoji,
+      title: h.title,
+      meta: h.meta,
+      completedDates: dates,
+      doneToday: isDoneToday(dates),
+      streak: computeStreak(dates),
     }
-  }
-  return out
+  })
 }
 
-const seed: Habit[] = [
-  {
-    id: uid(),
-    emoji: '📚',
-    title: 'Estudar',
-    meta: '10:00 · Cafeteria',
-    doneToday: false,
-    streak: 4,
-    completedDates: history(300, 0.55, 7),
+export const useHabitStore = create<HabitState>((set, get) => ({
+  habits: [],
+  selectedDate: todayISO(),
+  loaded: false,
+  load: async () => {
+    const [dbHabits, completions] = await Promise.all([api.listHabits(), api.listCompletions()])
+    const map = new Map<string, string[]>()
+    for (const c of completions) {
+      const arr = map.get(c.habit_id) ?? []
+      arr.push(c.date)
+      map.set(c.habit_id, arr)
+    }
+    set({ habits: build(dbHabits, map), loaded: true })
   },
-  {
-    id: uid(),
-    emoji: '🛒',
-    title: 'Compras',
-    meta: '14:00 · Mercado',
-    doneToday: false,
-    streak: 2,
-    completedDates: history(300, 0.3, 19),
+  addHabit: async (h) => {
+    const userId = useAuthStore.getState().user!.id
+    const position = get().habits.length
+    const optimistic: Habit = {
+      id: uid(), emoji: h.emoji, title: h.title, meta: h.meta,
+      completedDates: [], doneToday: false, streak: 0,
+    }
+    set((s) => ({ habits: [...s.habits, optimistic] }))
+    try {
+      const row = await api.insertHabit(userId, { ...h, position })
+      set((s) => ({ habits: s.habits.map((x) => (x.id === optimistic.id ? { ...x, id: row.id } : x)) }))
+    } catch {
+      set((s) => ({ habits: s.habits.filter((x) => x.id !== optimistic.id) }))
+    }
   },
-  {
-    id: uid(),
-    emoji: '🥦',
-    title: 'Comer saudável',
-    meta: '08:30 · Casa',
-    doneToday: true,
-    streak: 12,
-    completedDates: Array.from(new Set([todayISO(), ...history(300, 0.8, 23)])),
+  toggleHabit: async (id) => {
+    const userId = useAuthStore.getState().user!.id
+    const t = todayISO()
+    const prev = get().habits
+    set((s) => ({
+      habits: s.habits.map((h) => {
+        if (h.id !== id) return h
+        const now = !h.doneToday
+        const dates = now
+          ? Array.from(new Set([...h.completedDates, t]))
+          : h.completedDates.filter((d) => d !== t)
+        return { ...h, completedDates: dates, doneToday: now, streak: computeStreak(dates) }
+      }),
+    }))
+    try {
+      const wasDone = prev.find((h) => h.id === id)?.doneToday
+      if (wasDone) await api.removeCompletion(id, t)
+      else await api.addCompletion(userId, id, t)
+    } catch {
+      set({ habits: prev })
+    }
   },
-  {
-    id: uid(),
-    emoji: '📖',
-    title: 'Ler um livro',
-    meta: '08:00 · Biblioteca',
-    doneToday: true,
-    streak: 7,
-    completedDates: Array.from(new Set([todayISO(), ...history(300, 0.65, 41)])),
+  removeHabit: async (id) => {
+    const prev = get().habits
+    set((s) => ({ habits: s.habits.filter((h) => h.id !== id) }))
+    try { await api.deleteHabit(id) } catch { set({ habits: prev }) }
   },
-  {
-    id: uid(),
-    emoji: '🏊',
-    title: 'Natação 45min',
-    meta: '06:00 · Piscina',
-    doneToday: true,
-    streak: 9,
-    completedDates: Array.from(new Set([todayISO(), ...history(300, 0.45, 57)])),
-  },
-]
-
-export const useHabitStore = create<HabitState>()(
-  persist(
-    (set) => ({
-      habits: seed,
-      selectedDate: todayISO(),
-      addHabit: (h) =>
-        set((s) => ({
-          habits: [
-            ...s.habits,
-            { ...h, id: uid(), doneToday: false, streak: 0, completedDates: [] },
-          ],
-        })),
-      toggleHabit: (id) =>
-        set((s) => ({
-          habits: s.habits.map((h) => {
-            if (h.id !== id) return h
-            const now = !h.doneToday
-            const t = todayISO()
-            return {
-              ...h,
-              doneToday: now,
-              streak: now ? h.streak + 1 : Math.max(0, h.streak - 1),
-              completedDates: now
-                ? Array.from(new Set([...h.completedDates, t]))
-                : h.completedDates.filter((d) => d !== t),
-            }
-          }),
-        })),
-      removeHabit: (id) =>
-        set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
-      setSelectedDate: (iso) => set({ selectedDate: iso }),
-    }),
-    { name: 'tracker.habits.v3' }
-  )
-)
+  setSelectedDate: (iso) => set({ selectedDate: iso }),
+  reset: () => set({ habits: [], loaded: false }),
+}))

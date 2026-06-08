@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { cx } from '@/lib/utils'
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { name, email, setName, setEmail } = useProfileStore()
+  const { name, email, setName, setEmail, save } = useProfileStore()
   const theme = useThemeStore((s) => s.theme)
   const setTheme = useThemeStore((s) => s.setTheme)
 
@@ -27,12 +27,14 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => save()}
             className="bg-cardAlt rounded-pill px-4 h-11 text-item outline-none focus:ring-2 focus:ring-accent"
           />
           <label className="text-meta text-muted">Email</label>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => save()}
             className="bg-cardAlt rounded-pill px-4 h-11 text-item outline-none focus:ring-2 focus:ring-accent"
           />
         </section>

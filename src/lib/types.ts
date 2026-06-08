@@ -17,7 +17,8 @@ export interface Habit {
 // ---- Kanban ----
 export interface CardImage {
   id: string
-  dataUrl: string // base64
+  storagePath: string
+  dataUrl: string // signed URL for display
   name: string
 }
 
@@ -44,3 +45,6 @@ export interface Column {
   title: string
   cardIds: string[]
 }
+
+// alias used by the kanban store when reading jsonb labels
+export type DBLabel = Label

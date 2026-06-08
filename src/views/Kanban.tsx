@@ -6,6 +6,7 @@ import {
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
 import { useKanbanStore } from '@/store/kanbanStore'
+import * as kanbanApi from '@/lib/api/kanban'
 import { KanbanColumn } from '@/components/KanbanColumn'
 import { CardDrawer } from '@/components/CardDrawer'
 
@@ -13,6 +14,7 @@ export function Kanban() {
   const columns = useKanbanStore((s) => s.columns)
   const cards = useKanbanStore((s) => s.cards)
   const setColumns = useKanbanStore((s) => s.setColumns)
+  const persistColumnOrder = useKanbanStore((s) => s.persistColumnOrder)
   const moveCard = useKanbanStore((s) => s.moveCard)
   const addColumn = useKanbanStore((s) => s.addColumn)
 
@@ -36,7 +38,7 @@ export function Kanban() {
       if (toCol && toCol !== active.id) {
         const oldI = columns.findIndex((c) => c.id === active.id)
         const newI = columns.findIndex((c) => c.id === toCol)
-        if (oldI >= 0 && newI >= 0) setColumns(arrayMove(columns, oldI, newI))
+        if (oldI >= 0 && newI >= 0) persistColumnOrder(arrayMove(columns, oldI, newI))
       }
       return
     }
@@ -57,11 +59,12 @@ export function Kanban() {
       const oldI = target.cardIds.indexOf(active.id as string)
       const newI = target.cardIds.indexOf(over.id as string)
       if (oldI !== newI && oldI >= 0 && newI >= 0) {
-        setColumns(
-          columns.map((c) =>
-            c.id === toCol ? { ...c, cardIds: arrayMove(c.cardIds, oldI, newI) } : c
-          )
+        const reordered = columns.map((c) =>
+          c.id === toCol ? { ...c, cardIds: arrayMove(c.cardIds, oldI, newI) } : c
         )
+        setColumns(reordered)
+        const tgt = reordered.find((c) => c.id === toCol)!
+        void Promise.all(tgt.cardIds.map((cid, i) => kanbanApi.updateCard(cid, { position: i })))
       }
       return
     }

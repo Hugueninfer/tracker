@@ -119,7 +119,7 @@ export function CardDrawer() {
               <h3 className="text-item font-semibold mb-2">Anexos</h3>
               <ImageUpload
                 images={card.images}
-                onAdd={(img) => addImage(card.id, img)}
+                onAdd={(file) => addImage(card.id, file)}
                 onRemove={(id) => removeImage(card.id, id)}
               />
             </section>
