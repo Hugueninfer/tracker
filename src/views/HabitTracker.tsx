@@ -5,6 +5,7 @@ import { Card, CardHeader } from '@/components/Card'
 import { HabitCard } from '@/components/HabitCard'
 import { HabitHeatmap } from '@/components/HabitHeatmap'
 import { DailyQuote } from '@/components/DailyQuote'
+import { DailySummary } from '@/components/DailySummary'
 import { useHabitStore } from '@/store/habitStore'
 
 const EMOJIS = ['📚', '🛒', '🥦', '📖', '🏊', '🏋️', '🧘', '💧', '🏃', '🎯']
@@ -114,8 +115,11 @@ export function HabitTracker() {
 
       {/* sidebar column */}
       <div className="flex flex-col gap-5">
-        <Card className="bg-accent-tint flex-1 flex flex-col justify-center">
+        <Card className="bg-accent-tint flex-1 flex flex-col">
           <DailyQuote />
+          <div className="mt-auto">
+            <DailySummary />
+          </div>
         </Card>
       </div>
 
