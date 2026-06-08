@@ -19,3 +19,6 @@ tsconfig.tsbuildinfo
 # supabase CLI local cache
 supabase/.temp/
 supabase/.branches/
+
+# internal planning docs (not part of the product)
+docs/superpowers/
