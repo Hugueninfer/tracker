@@ -44,3 +44,6 @@ export interface Column {
   title: string
   cardIds: string[]
 }
+
+// alias used by the kanban store when reading jsonb labels
+export type DBLabel = Label
