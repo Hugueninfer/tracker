@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Card, CardHeader } from '@/components/Card'
@@ -12,6 +12,9 @@ const EMOJIS = ['📚', '🛒', '🥦', '📖', '🏊', '🏋️', '🧘', '💧
 export function HabitTracker() {
   const habits = useHabitStore((s) => s.habits)
   const addHabit = useHabitStore((s) => s.addHabit)
+  const load = useHabitStore((s) => s.load)
+  const loaded = useHabitStore((s) => s.loaded)
+  useEffect(() => { if (!loaded) load() }, [loaded, load])
   const [adding, setAdding] = useState(false)
   const [title, setTitle] = useState('')
   const [meta, setMeta] = useState('')
